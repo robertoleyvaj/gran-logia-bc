@@ -19,6 +19,37 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
+/* ── Hero entrance animations ── */
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes heroSlideLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.hero-label   { animation: heroSlideLeft 0.7s ease both; animation-delay: 0.1s; }
+.hero-h1      { animation: heroFadeUp   0.8s ease both; animation-delay: 0.25s; }
+.hero-sub     { animation: heroFadeUp   0.8s ease both; animation-delay: 0.45s; }
+.hero-ctas    { animation: heroFadeUp   0.8s ease both; animation-delay: 0.6s; }
+.hero-img     { animation: heroFadeIn   1.2s ease both; animation-delay: 0.1s; }
+
+/* ── Scroll reveal (applied via JS/IntersectionObserver) ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 body {
   background: #fff;
   color: #3A3A3A;
