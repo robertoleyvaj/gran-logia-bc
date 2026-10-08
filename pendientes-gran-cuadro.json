@@ -1,0 +1,80 @@
+{
+  "titulo": "Gran Logia de Estado \"Baja California\" — Datos pendientes del Gran Cuadro",
+  "fecha": "Septiembre 2026",
+  "nota": "Lista de oficiales con datos faltantes para el sitio web oficial. Cada oficial necesita: nombre, cargo, logia, foto y mensaje.",
+  "pendientes": [
+    {
+      "cargo": "Segundo Gran Vigilante",
+      "nombre": "Alberto Zúñiga Barragán",
+      "logia": "R∴L∴S∴ 'Pueblos Yumanos' No.72",
+      "falta": ["foto"]
+    },
+    {
+      "cargo": "Oficial Mayor",
+      "nombre": "Luis Adolfo Bernal Salas",
+      "logia": "R∴L∴S∴ 'Landmark' No.56",
+      "falta": ["foto", "mensaje"]
+    },
+    {
+      "cargo": "Gran Maestro de Ceremonias",
+      "nombre": "Gustavo Flores Betanzos",
+      "logia": "R∴L∴S∴ 'Agustín Sanginés' No.45",
+      "falta": ["foto", "mensaje"]
+    },
+    {
+      "cargo": "Primer Gran Experto",
+      "nombre": "Amado Ovidio Gil Siqueiros",
+      "logia": "R∴L∴S∴ 'Cosmos' No.62",
+      "falta": ["foto", "mensaje"]
+    },
+    {
+      "cargo": "Segundo Gran Experto",
+      "nombre": "Óscar Manuel López Pérez",
+      "logia": "R∴L∴S∴ 'Xicoténcatl Leyva Alemán' No.68",
+      "falta": ["foto", "mensaje"]
+    },
+    {
+      "cargo": "Gran Hospitalario",
+      "nombre": "Gregorio Gandhi Loya Cortez",
+      "logia": "R∴L∴S∴ 'Alfa y Omega' No.73",
+      "falta": ["foto", "mensaje"]
+    },
+    {
+      "cargo": "Gran Guarda Templo Exterior",
+      "nombre": "Carlos Adrián Salmerón Canizalez",
+      "logia": "D∴L∴y P∴R∴L∴S∴ 'Manuel P. Barbachano' No.18",
+      "falta": ["foto", "mensaje"]
+    },
+    {
+      "cargo": "Diputado de Distrito Tijuana – Rosarito",
+      "nombre": "Nombramiento pendiente",
+      "logia": "",
+      "falta": ["nombre", "foto", "mensaje"]
+    },
+    {
+      "cargo": "Diputado de Distrito Valle de Mexicali",
+      "nombre": "Erasmo Gomez Gomez",
+      "logia": "D∴L∴y P∴R∴L∴S∴ 'Energía' No.13",
+      "falta": ["foto", "mensaje"]
+    }
+  ],
+  "mensajes_faltantes": {
+    "nota": "Además de los anteriores, los siguientes oficiales tienen foto pero les falta el mensaje para su perfil",
+    "oficiales": [
+      { "cargo": "Muy Respetable Gran Maestro", "nombre": "Ernesto Girbau Jiménez" },
+      { "cargo": "Diputado Gran Maestro", "nombre": "Jonathan Alain Abarca Guzmán" },
+      { "cargo": "Primer Gran Vigilante", "nombre": "Cristobal Ruiz León" },
+      { "cargo": "Gran Orador", "nombre": "César Romeo Santos Díaz" },
+      { "cargo": "Gran Tesorero", "nombre": "Servando Alvarado López" },
+      { "cargo": "Gran Secretario", "nombre": "Ricardo Elías Osorio Rueda" },
+      { "cargo": "Primer Gran Diácono", "nombre": "Arturo Herrera Serrano" },
+      { "cargo": "Segundo Gran Diácono", "nombre": "Alberto Maya Levi" },
+      { "cargo": "Gran Ecónomo", "nombre": "Javier Alejandro Loaiza Vélez" },
+      { "cargo": "Gran Porta Estandarte", "nombre": "Riggel Alioth Dehesa Zazueta" },
+      { "cargo": "Gran Guarda Templo Interior", "nombre": "Edgar Rogelio Reyes Galicia" },
+      { "cargo": "Gran Comisionado ante la AJEF", "nombre": "Roberto Leyva Jaramillo" },
+      { "cargo": "Diputado de Distrito Mexicali", "nombre": "Germán Báez Ramírez" },
+      { "cargo": "Diputado de Distrito Tecate – Ensenada", "nombre": "Benjamín Bello Valle" }
+    ]
+  }
+}
