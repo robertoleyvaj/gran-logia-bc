@@ -16,6 +16,7 @@ export interface Logia {
   facebook?: string;
   instagram?: string;
   cuadro?: Oficial[];
+  mensaje?: string;
 }
 
 export const logias: Logia[] = [
