@@ -1,172 +1,153 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useMemo, useState } from "react";
+import Link from "@/i18n/Link";
+import { useT } from "@/i18n/LocaleProvider";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import PageHero from "@/components/layout/PageHero";
 import { logias, ciudades } from "@/data/logias";
 
-const R = "var(--font-raleway), sans-serif";
-const D = "var(--font-dm-sans), system-ui, sans-serif";
-const navy = "#0B2447";
-const navyDark = "#060F1E";
-const gold = "#B08D57";
-const ivory = "#F5F1EA";
-const border = "#E2DDD4";
-const textLight = "#6A6A6A";
+const R  = "var(--font-raleway), sans-serif";
+const D  = "var(--font-dm-sans), system-ui, sans-serif";
+const Co = "var(--font-cormorant), Georgia, 'Times New Roman', serif";
+
+const deep    = "#061426";
+const gold    = "#C6A15B";
+const goldDk  = "#8a6d3b";
+const cream   = "#F5F1E9";
+const canvas  = "#f4f4f5";
+const textPri = "#09090b";
+const textMut = "#71717a";
+const line    = "#e4e4e7";
+
+const normalizar = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 export default function LogiasJurisdiccion() {
-  const [ciudadActiva, setCiudadActiva] = useState<string>("Todas");
+  const t = useT();
+  const L = t.logias;
+  const [ciudad, setCiudad] = useState<string>("Todas");
+  const [busqueda, setBusqueda] = useState("");
 
-  const filtradas = ciudadActiva === "Todas"
-    ? logias
-    : logias.filter(l => l.ciudad === ciudadActiva);
+  const conteo = (c: string) => (c === "Todas" ? logias.length : logias.filter(l => l.ciudad === c).length);
 
-  const conteo = (ciudad: string) =>
-    ciudad === "Todas" ? logias.length : logias.filter(l => l.ciudad === ciudad).length;
+  const filtradas = useMemo(() => {
+    const q = normalizar(busqueda.trim());
+    return [...logias]
+      .sort((a, b) => a.numero - b.numero)
+      .filter(l => ciudad === "Todas" || l.ciudad === ciudad)
+      .filter(l => !q || normalizar(l.nombre).includes(q) || String(l.numero) === q.replace(/\D/g, "") || normalizar(l.ciudad).includes(q));
+  }, [ciudad, busqueda]);
 
   return (
     <>
       <Navbar />
-      <main>
+      <main style={{ backgroundColor: canvas }}>
 
-        {/* ── PAGE HEADER ── */}
-        <section style={{
-          paddingTop: "140px",
-          paddingBottom: "72px",
-          position: "relative",
-          overflow: "hidden",
-          minHeight: "380px",
-        }}>
-          <img src="/granlogiafraternidad.jpg" alt="" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
-          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to right, ${navyDark} 25%, rgba(6,15,30,0.88) 55%, rgba(6,15,30,0.5) 100%)` }} />
-          <div className="max-w-7xl mx-auto px-8" style={{ position: "relative", zIndex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "32px" }}>
-              <Link href="/" style={{ fontFamily: R, color: "rgba(255,255,255,0.3)", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase" }}>Inicio</Link>
-              <span style={{ color: "rgba(255,255,255,0.2)" }}>›</span>
-              <Link href="/la-gran-logia/gran-cuadro" style={{ fontFamily: R, color: "rgba(255,255,255,0.3)", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase" }}>La Gran Logia</Link>
-              <span style={{ color: "rgba(255,255,255,0.2)" }}>›</span>
-              <span style={{ fontFamily: R, color: gold, fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase" }}>Logias de la Jurisdicción</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
-              <div style={{ width: "32px", height: "1px", backgroundColor: gold }} />
-              <span style={{ fontFamily: R, color: gold, fontSize: "10px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase" }}>
-                Muy Respetable Gran Logia de Estado "Baja California"
-              </span>
-            </div>
-            <h1 style={{ fontFamily: R, color: "#fff", fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 700, letterSpacing: "-0.5px", marginBottom: "10px" }}>
-              Logias de la Jurisdicción
-            </h1>
-            <p style={{ fontFamily: D, color: "rgba(255,255,255,0.4)", fontSize: "15px" }}>
-              {logias.length} logias activas en Baja California
-            </p>
-          </div>
-        </section>
+        <PageHero
+          crumbs={[{ label: t.common.home, href: "/" }, { label: t.common.granLogia, href: "/la-gran-logia" }, { label: L.crumb }]}
+          label={L.hero.label}
+          title={<>{L.hero.title1}<br />{L.hero.title2}</>}
+          intro={L.hero.intro(logias.length)}
+          img="/granlogiafraternidad.jpg"
+          imgPos="center top"
+          mobileImgPos="60% top"
+        />
 
-        {/* ── FILTROS POR CIUDAD ── */}
-        <div style={{ backgroundColor: "#fff", borderBottom: `1px solid ${border}`, position: "sticky", top: "76px", zIndex: 40 }}>
-          <div className="max-w-7xl mx-auto px-8">
-            <div style={{ display: "flex", gap: "0", overflowX: "auto" }}>
-              {["Todas", ...ciudades].map((ciudad) => (
-                <button
-                  key={ciudad}
-                  onClick={() => setCiudadActiva(ciudad)}
-                  style={{
-                    fontFamily: R,
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    letterSpacing: "1px",
-                    textTransform: "uppercase",
-                    color: ciudadActiva === ciudad ? navy : "rgba(11,36,71,0.4)",
-                    padding: "18px 20px",
-                    borderBottom: ciudadActiva === ciudad ? `2px solid ${gold}` : "2px solid transparent",
-                    background: "none",
-                    border: "none",
-                    borderBottomStyle: "solid",
-                    borderBottomWidth: "2px",
-                    borderBottomColor: ciudadActiva === ciudad ? gold : "transparent",
-                    cursor: "pointer",
-                    whiteSpace: "nowrap",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {ciudad}
-                  <span style={{
-                    marginLeft: "6px",
-                    fontFamily: D,
-                    fontSize: "10px",
-                    color: ciudadActiva === ciudad ? gold : "rgba(11,36,71,0.3)",
-                    fontWeight: 400,
-                  }}>
-                    ({conteo(ciudad)})
-                  </span>
-                </button>
-              ))}
+        {/* ── BUSCADOR + FILTROS ── */}
+        <div className="sticky-bar" style={{ backgroundColor: "rgba(244,244,245,0.92)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderBottom: `1px solid ${line}` }}>
+          <div className="wrap" style={{ paddingTop: "14px", paddingBottom: "14px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ position: "relative" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={textMut} strokeWidth="2" strokeLinecap="round" style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)" }}>
+                <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" />
+              </svg>
+              <input
+                className="search-input"
+                type="search"
+                value={busqueda}
+                onChange={e => setBusqueda(e.target.value)}
+                placeholder={L.search}
+                aria-label={L.searchAria}
+                style={{ width: "100%", height: "50px", padding: "0 16px 0 46px", borderRadius: "14px", border: `1px solid ${line}`, backgroundColor: "#fff", fontFamily: D, fontSize: "16px", color: textPri, transition: "border-color .2s, box-shadow .2s" }}
+              />
+            </div>
+
+            <div className="chips" role="tablist" aria-label={L.filterAria}>
+              {["Todas", ...ciudades].map(c => {
+                const etiqueta = c === "Todas" ? L.all : c;
+                const on = ciudad === c;
+                return (
+                  <button key={c} role="tab" aria-selected={on} onClick={() => setCiudad(c)}
+                    style={{
+                      flexShrink: 0, display: "flex", alignItems: "center", gap: "8px",
+                      padding: "9px 16px", borderRadius: "100px", cursor: "pointer",
+                      border: `1px solid ${on ? deep : line}`,
+                      backgroundColor: on ? deep : "#fff",
+                      color: on ? "#fff" : textPri,
+                      fontFamily: R, fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap",
+                      transition: "all .2s",
+                    }}>
+                    {etiqueta}
+                    <span style={{ fontFamily: D, fontSize: "12px", fontWeight: 500, color: on ? gold : textMut }}>{conteo(c)}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* ── LISTA DE LOGIAS ── */}
-        <section style={{ backgroundColor: ivory, padding: "64px 0" }}>
-          <div className="max-w-7xl mx-auto px-8">
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
-              gap: "2px",
-              backgroundColor: border,
-            }}>
-              {filtradas.map((logia) => (
-                <Link
-                  key={logia.numero}
-                  href={`/la-gran-logia/logias/${logia.numero}`}
-                  style={{ textDecoration: "none" }}
-                >
-                <div
-                  style={{
-                    backgroundColor: "#fff",
-                    padding: "20px 24px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "20px",
-                    transition: "background 0.2s",
-                    cursor: "pointer",
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = ivory)}
-                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#fff")}
-                >
-                  {/* Logo o número */}
-                  <div style={{ width: "56px", height: "56px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {logia.foto ? (
-                      <img src={logia.foto} alt={logia.nombre} style={{ width: "56px", height: "56px", objectFit: "contain" }} />
-                    ) : (
-                      <div style={{ fontFamily: R, color: `${gold}60`, fontSize: "1.4rem", fontWeight: 700, lineHeight: 1 }}>
-                        {logia.numero}
-                      </div>
-                    )}
+        {/* ── LISTA ── */}
+        <section style={{ padding: "36px 0 96px" }}>
+          <div className="wrap">
+            <div style={{ fontFamily: D, color: textMut, fontSize: "15px", marginBottom: "18px" }}>
+              {filtradas.length === logias.length
+                ? L.showingAll(logias.length)
+                : L.found(filtradas.length)}
+            </div>
+
+            <div className="logia-grid">
+              {filtradas.map(l => (
+                <Link key={l.numero} href={`/la-gran-logia/logias/${l.numero}`} className="logia-card"
+                  style={{ display: "flex", alignItems: "center", gap: "18px", padding: "18px 20px", backgroundColor: "#fff", border: `1px solid ${line}`, borderRadius: "16px", textDecoration: "none" }}>
+
+                  {/* Emblema */}
+                  <div style={{ width: "72px", height: "72px", flexShrink: 0, borderRadius: "14px", backgroundColor: cream, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                    {l.foto
+                      ? <img src={l.foto} alt={`${L.emblem} ${l.nombre}`} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "contain", padding: "6px" }} />
+                      : <span style={{ fontFamily: Co, color: goldDk, fontSize: "2rem", fontWeight: 600, lineHeight: 1 }}>{l.numero}</span>}
                   </div>
 
-                  {/* Info */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: R, color: `${gold}80`, fontSize: "10px", fontWeight: 700, letterSpacing: "1px", marginBottom: "3px" }}>
-                      No.{logia.numero}
+                  {/* Datos */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                      <span style={{ fontFamily: R, color: goldDk, fontSize: "12px", fontWeight: 700, letterSpacing: "1px" }}>No. {l.numero}</span>
+                      {l.anio === 1933 && (
+                        <span style={{ fontFamily: R, color: deep, backgroundColor: cream, fontSize: "10px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", padding: "3px 8px", borderRadius: "100px" }}>{L.founder}</span>
+                      )}
                     </div>
-                    <div style={{ fontFamily: R, color: navy, fontSize: "14px", fontWeight: 700, lineHeight: 1.3, marginBottom: "5px" }}>
-                      "{logia.nombre}"
+                    <div style={{ fontFamily: Co, color: textPri, fontSize: "1.45rem", fontWeight: 600, lineHeight: 1.1, marginBottom: "6px" }}>
+                      {l.nombre}
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                      <span style={{ fontFamily: D, color: textLight, fontSize: "12px" }}>{logia.ciudad}</span>
-                      <span style={{ width: "3px", height: "3px", borderRadius: "50%", backgroundColor: border, display: "inline-block" }} />
-                      <span style={{ fontFamily: D, color: textLight, fontSize: "12px" }}>Fund. {logia.anio}</span>
+                    <div style={{ fontFamily: D, color: textMut, fontSize: "14px" }}>
+                      {l.ciudad} · {L.founded} {l.anio}
                     </div>
                   </div>
-                </div>
+
+                  <span style={{ width: "38px", height: "38px", flexShrink: 0, borderRadius: "50%", border: `1px solid ${line}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span className="bento-arrow-icon" style={{ color: deep, fontSize: "16px" }}>→</span>
+                  </span>
                 </Link>
               ))}
             </div>
 
             {filtradas.length === 0 && (
-              <div style={{ textAlign: "center", padding: "64px", color: textLight, fontFamily: D }}>
-                No hay logias en esta ciudad.
+              <div style={{ textAlign: "center", padding: "64px 20px", backgroundColor: "#fff", border: `1px solid ${line}`, borderRadius: "16px" }}>
+                <div style={{ fontFamily: Co, color: textPri, fontSize: "1.8rem", marginBottom: "8px" }}>{L.empty.title}</div>
+                <p style={{ fontFamily: D, color: textMut, fontSize: "16px", marginBottom: "20px" }}>{L.empty.text}</p>
+                <button onClick={() => { setBusqueda(""); setCiudad("Todas"); }}
+                  style={{ fontFamily: R, fontSize: "14px", fontWeight: 700, color: deep, background: "none", border: `1px solid ${deep}`, borderRadius: "12px", padding: "12px 22px", cursor: "pointer" }}>
+                  {L.empty.btn}
+                </button>
               </div>
             )}
           </div>

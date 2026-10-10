@@ -1,176 +1,163 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/i18n/Link";
+import { useT } from "@/i18n/LocaleProvider";
+import { cargo } from "@/i18n/dictionaries";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { oficiales } from "@/data/gran-cuadro";
+import PageHero from "@/components/layout/PageHero";
+import { oficiales, type Oficial } from "@/data/gran-cuadro";
 
-const R = "var(--font-raleway), sans-serif";
-const Co = "var(--font-cormorant), Georgia, serif";
-const navy = "#0B2447";
-const navyDark = "#060F1E";
-const gold = "#B08D57";
-const ivory = "#F5F1EA";
-const border = "#E2DDD4";
+const R  = "var(--font-raleway), sans-serif";
+const D  = "var(--font-dm-sans), system-ui, sans-serif";
+const Co = "var(--font-cormorant), Georgia, 'Times New Roman', serif";
 
-function getIniciales(nombre: string) {
-  return nombre.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
-}
+const deep    = "#061426";
+const navyDk  = "#060F1E";
+const gold    = "#C6A15B";
+const canvas  = "#f4f4f5";
+const textPri = "#09090b";
+const textMut = "#71717a";
 
-function OfficialCard({ oficial, large, framed }: { oficial: { slug: string; cargo: string; nombre: string; foto?: string }, large: boolean, framed?: boolean }) {
-  const card = (
-    <Link href={`/la-gran-logia/gran-cuadro/${oficial.slug}`} style={{ display: "block", textDecoration: "none" }}>
-      <div
-        onMouseEnter={e => {
-          const wrap = e.currentTarget.querySelector(".foto-wrap") as HTMLElement;
-          if (wrap) wrap.style.transform = "scale(1.04)";
-        }}
-        onMouseLeave={e => {
-          const wrap = e.currentTarget.querySelector(".foto-wrap") as HTMLElement;
-          if (wrap) wrap.style.transform = "scale(1)";
-        }}
-      >
-        <div style={{ overflow: "hidden", marginBottom: large ? "16px" : "12px" }}>
-          <div className="foto-wrap" style={{ transition: "transform 0.4s ease" }}>
-            {oficial.foto ? (
-              <img
-                src={oficial.foto}
-                alt={oficial.nombre}
-                style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", objectPosition: "top", display: "block" }}
-              />
-            ) : (
-              <div style={{
-                width: "100%", aspectRatio: "3/4",
-                background: "linear-gradient(160deg, #1A3A6B 0%, #060F1E 100%)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                position: "relative",
-              }}>
-                <span style={{ fontFamily: R, color: `${gold}45`, fontSize: large ? "2.5rem" : "2rem", fontWeight: 200, zIndex: 1 }}>
-                  {getIniciales(oficial.nombre)}
-                </span>
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(6,15,30,0.4) 0%, transparent 55%)" }} />
-              </div>
-            )}
-          </div>
+const iniciales = (n: string) => n.split(" ").filter(Boolean).slice(0, 2).map(p => p[0]).join("").toUpperCase();
+
+/* Tarjeta retrato: foto completa con nombre y cargo sobre degradado */
+function Retrato({ o, size = "md" }: { o: Oficial; size?: "md" | "sm" }) {
+  const t = useT();
+  const pendiente = o.nombre.toLowerCase().includes("pendiente");
+  return (
+    <Link href={`/la-gran-logia/gran-cuadro/${o.slug}`} className="bento-card gc-card"
+      style={{ position: "relative", display: "block", aspectRatio: "3 / 4", borderRadius: "16px", overflow: "hidden", backgroundColor: deep, textDecoration: "none" }}>
+      {o.foto ? (
+        <img src={o.foto} alt={o.nombre} loading="lazy" className="bento-img"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+      ) : (
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 80% 60% at 50% 35%, #1A3A6B 0%, #060F1E 75%)", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "30%" }}>
+          <span style={{ fontFamily: Co, color: "rgba(198,161,91,0.45)", fontSize: size === "md" ? "4.5rem" : "3.5rem", fontWeight: 500, letterSpacing: "2px" }}>
+            {pendiente ? "—" : iniciales(o.nombre)}
+          </span>
         </div>
-        <div style={{ fontFamily: R, color: gold, fontSize: large ? "10px" : "9px", fontWeight: 800, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "5px" }}>
-          {oficial.cargo}
+      )}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(6,20,38,0.95) 0%, rgba(6,20,38,0.65) 28%, transparent 55%)" }} />
+
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: size === "md" ? "20px 20px 22px" : "16px 16px 18px" }}>
+        <div className="gc-cargo" style={{ fontFamily: R, color: gold, fontSize: size === "md" ? "12px" : "11px", fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", lineHeight: 1.35, marginBottom: "6px" }}>
+          {cargo(t, o.cargo)}
         </div>
-        <div style={{ fontFamily: R, color: navy, fontSize: large ? "15px" : "13px", fontWeight: 800, lineHeight: 1.3, marginBottom: "8px" }}>
-          {oficial.nombre}
-        </div>
-        <div style={{ fontFamily: R, color: gold, fontSize: "10px", fontWeight: 700 }}>
-          Ver perfil →
+        <div className="gc-name" style={{ fontFamily: Co, color: pendiente ? "rgba(255,255,255,0.55)" : "#fff", fontStyle: pendiente ? "italic" : "normal", fontSize: size === "md" ? "1.6rem" : "1.35rem", fontWeight: 600, lineHeight: 1.1 }}>
+          {o.nombre}
         </div>
       </div>
     </Link>
   );
+}
 
-  if (!framed) return card;
-
+function Encabezado({ label, titulo, total }: { label: string; titulo: string; total: number }) {
+  const t = useT();
   return (
-    <div style={{ position: "relative", padding: "12px" }}>
-      <div style={{ position: "absolute", inset: 0, border: `1px solid ${gold}40`, pointerEvents: "none" }} />
-      {[
-        { top: 0, left: 0, borderTop: `2px solid ${gold}`, borderLeft: `2px solid ${gold}` },
-        { top: 0, right: 0, borderTop: `2px solid ${gold}`, borderRight: `2px solid ${gold}` },
-        { bottom: 0, left: 0, borderBottom: `2px solid ${gold}`, borderLeft: `2px solid ${gold}` },
-        { bottom: 0, right: 0, borderBottom: `2px solid ${gold}`, borderRight: `2px solid ${gold}` },
-      ].map((style, i) => (
-        <div key={i} style={{ position: "absolute", width: "14px", height: "14px", pointerEvents: "none", ...style }} />
-      ))}
-      {card}
+    <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
+      <div>
+        <span style={{ display: "block", fontFamily: R, color: gold, fontSize: "12px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase", marginBottom: "10px" }}>{label}</span>
+        <h2 className="gc-title" style={{ fontFamily: Co, color: textPri, fontSize: "clamp(1.8rem, 2.6vw, 2.4rem)", fontWeight: 500, lineHeight: 1.1 }}>{titulo}</h2>
+      </div>
+      <span className="d-only" style={{ fontFamily: D, color: textMut, fontSize: "15px" }}>{t.granCuadro.count(total)}</span>
     </div>
   );
 }
 
 export default function GranCuadro() {
+  const t = useT();
+  const G = t.granCuadro;
+  // Por ahora solo se muestran los oficiales que ya tienen fotografía
+  const conFoto     = oficiales.filter(o => !!o.foto);
+  const gm          = oficiales[0];
+  const principales = conFoto.filter(o => o.grupo === "Oficiales Principales" && o.slug !== gm.slug);
+  const menores     = conFoto.filter(o => o.grupo === "Oficiales Menores");
+  const diputados   = conFoto.filter(o => o.grupo === "Diputados de Distrito");
+
   return (
     <>
       <Navbar />
-      <main>
+      <main style={{ backgroundColor: canvas }}>
 
-        {/* ── PAGE HEADER ── */}
-        <section style={{
-          backgroundColor: navyDark,
-          paddingTop: "76px",
-          position: "relative",
-          overflow: "hidden",
-        }}>
-          {/* Foto grupal de portada */}
-          <div style={{ position: "relative", height: "560px" }}>
-            <img
-              src="/gran-cuadro.jpg"
-              alt="Gran Cuadro de Oficiales"
-              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center", display: "block" }}
-            />
-            <div style={{
-              position: "absolute", inset: 0,
-              background: "linear-gradient(to bottom, rgba(6,15,30,0.3) 0%, rgba(6,15,30,0.7) 60%, rgba(6,15,30,1) 100%)",
-            }} />
-            <div className="max-w-7xl mx-auto px-8" style={{ position: "absolute", bottom: "48px", left: 0, right: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
-                <Link href="/" style={{ fontFamily: R, color: "rgba(255,255,255,0.3)", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase" }}>Inicio</Link>
-                <span style={{ color: "rgba(255,255,255,0.2)" }}>›</span>
-                <span style={{ fontFamily: R, color: gold, fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase" }}>Gran Cuadro</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "12px" }}>
-                <div style={{ width: "32px", height: "1px", backgroundColor: gold }} />
-                <span style={{ fontFamily: R, color: gold, fontSize: "10px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase" }}>
-                  Muy Respetable Gran Logia de Estado "Baja California"
+        <PageHero
+          crumbs={[{ label: t.common.home, href: "/" }, { label: t.common.granLogia, href: "/la-gran-logia" }, { label: G.crumb }]}
+          label={G.hero.label}
+          title={<>{G.hero.title1}<br />{G.hero.title2}</>}
+          intro={G.hero.intro}
+          img="/gran-cuadro.jpg"
+          imgPos="center center"
+          mobileImgPos="center center"
+        />
+
+        {/* ── GRAN MAESTRO ── */}
+        <section style={{ backgroundColor: navyDk, position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 50% 80% at 75% 50%, rgba(26,58,107,0.45) 0%, transparent 70%)" }} />
+          <div className="wrap gm-wrap" style={{ position: "relative", paddingTop: "96px", paddingBottom: "96px" }}>
+            <div className="gm-grid">
+              <Link href={`/la-gran-logia/gran-cuadro/${gm.slug}`} className="bento-card gm-photo"
+                style={{ position: "relative", display: "block", aspectRatio: "4 / 5", borderRadius: "22px", overflow: "hidden", boxShadow: "0 30px 80px rgba(0,0,0,0.45)" }}>
+                {gm.foto && <img src={gm.foto} alt={gm.nombre} className="bento-img" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />}
+                <div style={{ position: "absolute", inset: 0, boxShadow: "inset 0 0 0 1px rgba(198,161,91,0.35)", borderRadius: "22px" }} />
+              </Link>
+
+              <div>
+                <span style={{ display: "block", fontFamily: R, color: gold, fontSize: "12px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase", marginBottom: "18px" }}>
+                  {cargo(t, gm.cargo)}
                 </span>
+                <h2 style={{ fontFamily: Co, color: "#fff", fontSize: "clamp(2.8rem, 5vw, 4.6rem)", fontWeight: 500, lineHeight: 1, letterSpacing: "-0.5px", marginBottom: "14px" }}>
+                  {gm.nombre}
+                </h2>
+                {gm.logia && (
+                  <div style={{ fontFamily: D, color: "rgba(255,255,255,0.55)", fontSize: "15px", marginBottom: "36px" }}>
+                    {gm.logia}
+                  </div>
+                )}
+                {gm.mensaje && (
+                  <blockquote style={{ margin: "0 0 40px", paddingLeft: "24px", borderLeft: `2px solid ${gold}` }}>
+                    <p style={{ fontFamily: Co, color: "rgba(255,255,255,0.9)", fontSize: "clamp(1.4rem, 2.2vw, 1.85rem)", fontStyle: "italic", fontWeight: 500, lineHeight: 1.4 }}>
+                      &ldquo;{gm.mensaje}&rdquo;
+                    </p>
+                  </blockquote>
+                )}
+                <Link href={`/la-gran-logia/gran-cuadro/${gm.slug}`} className="bento-card"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "14px", textDecoration: "none" }}>
+                  <span style={{ width: "48px", height: "48px", borderRadius: "50%", border: "1px solid rgba(198,161,91,0.55)", backgroundColor: "rgba(198,161,91,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span className="bento-arrow-icon" style={{ color: gold, fontSize: "18px" }}>→</span>
+                  </span>
+                  <span style={{ fontFamily: R, color: gold, fontSize: "13px", fontWeight: 700, letterSpacing: "2.5px", textTransform: "uppercase" }}>{G.fullProfile}</span>
+                </Link>
               </div>
-              <h1 style={{ fontFamily: R, color: "#fff", fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 700, letterSpacing: "-0.5px", marginBottom: "8px" }}>
-                Gran Cuadro de Oficiales
-              </h1>
-              <p style={{ fontFamily: Co, color: "rgba(255,255,255,0.5)", fontSize: "1.1rem", fontStyle: "italic" }}>
-                Ciclo 2026–2028 · Autoridades en funciones de la jurisdicción
-              </p>
             </div>
           </div>
         </section>
 
-        {/* ── OFICIALES PRINCIPALES (primeros 7) ── */}
-        <section style={{ backgroundColor: ivory, padding: "72px 0 48px" }}>
-          <div className="max-w-7xl mx-auto px-8">
-
-            {/* Etiqueta de sección */}
-            <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "40px" }}>
-              <div style={{ width: "32px", height: "2px", backgroundColor: gold }} />
-              <span style={{ fontFamily: R, color: gold, fontSize: "10px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase" }}>
-                Oficiales Principales
-              </span>
-            </div>
-
-            {/* Gran Maestro — destacado solo */}
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "32px" }}>
-              <div style={{ width: "280px" }}>
-                <OfficialCard oficial={oficiales[0]} large framed />
-              </div>
-            </div>
-
-            {/* Fila 2: siguientes 6 */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", maxWidth: "840px", margin: "0 auto" }}>
-              {oficiales.slice(1, 7).map((oficial) => (
-                <OfficialCard key={oficial.slug} oficial={oficial} large framed />
-              ))}
+        {/* ── OFICIALES PRINCIPALES ── */}
+        <section className="sec">
+          <div className="wrap">
+            <Encabezado label={G.principales.label} titulo={G.principales.title} total={principales.length} />
+            <div className="gc-grid-4">
+              {principales.map(o => <Retrato key={o.slug} o={o} />)}
             </div>
           </div>
         </section>
 
-        {/* ── OFICIALES MENORES Y DIPUTADOS ── */}
-        <section style={{ backgroundColor: "#fff", padding: "48px 0 72px" }}>
-          <div className="max-w-7xl mx-auto px-8">
-            <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "40px" }}>
-              <div style={{ width: "32px", height: "2px", backgroundColor: `${gold}60` }} />
-              <span style={{ fontFamily: R, color: "rgba(11,36,71,0.4)", fontSize: "10px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase" }}>
-                Oficiales Menores y Diputados de Distrito
-              </span>
+        {/* ── OFICIALES MENORES ── */}
+        <section className="sec" style={{ backgroundColor: "#fff", borderTop: "1px solid #e4e4e7" }}>
+          <div className="wrap">
+            <Encabezado label={G.menores.label} titulo={G.menores.title} total={menores.length} />
+            <div className="gc-grid-5">
+              {menores.map(o => <Retrato key={o.slug} o={o} size="sm" />)}
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "24px" }}>
-              {oficiales.slice(7).map((oficial) => (
-                <OfficialCard key={oficial.slug} oficial={oficial} large={false} />
-              ))}
+          </div>
+        </section>
+
+        {/* ── DIPUTADOS DE DISTRITO ── */}
+        <section className="sec">
+          <div className="wrap">
+            <Encabezado label={G.diputados.label} titulo={G.diputados.title} total={diputados.length} />
+            <div className="gc-grid-4">
+              {diputados.map(o => <Retrato key={o.slug} o={o} size="sm" />)}
             </div>
           </div>
         </section>

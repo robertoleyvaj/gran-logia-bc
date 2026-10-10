@@ -1,117 +1,115 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/i18n/Link";
+import { useT } from "@/i18n/LocaleProvider";
 
-const C = {
-  navyDark: "#060F1E",
-  gold: "#B08D57",
-  cinzel: "var(--font-cinzel), 'Times New Roman', serif",
-  cormorant: "var(--font-cormorant), Georgia, serif",
-};
+const R  = "var(--font-raleway), sans-serif";
+const D  = "var(--font-dm-sans), system-ui, sans-serif";
+const Co = "var(--font-cormorant), Georgia, serif";
 
-const cols = {
-  Institución: ["Historia", "Gran Cuadro", "Ex Grandes Maestros", "Documentos Oficiales", "Galería"],
-  Masonería: ["¿Qué es la Masonería?", "Preguntas Frecuentes", "Cómo Ingresar", "Mitos y Realidades"],
-  Recursos: ["Noticias y Eventos", "Biblioteca", "Boletines", "Enlaces de Interés"],
-};
+const navyDk = "#060F1E";
+const gold   = "#C6A15B";
+
+const FB_URL = process.env.NEXT_PUBLIC_FB_PAGE_URL || "https://www.facebook.com/masonesbc";
+const DIRECCION = "Calle Francisco Goitia 9927-3A, Zona Río, Tijuana, B.C. C.P. 22000";
+const CORREO = "masonesdebajacalifornia@gmail.com";
+
+// Solo páginas que existen (los textos vienen del diccionario)
+const hrefsGranLogia = ["/la-gran-logia/gran-cuadro", "/la-gran-logia/mision", "/la-gran-logia/logias", "/noticias"];
+const hrefsMasoneria = ["/masoneria", "/masoneria/rito-escoces", "/masoneria/rito-de-york", "/masoneria/shriners", "/masoneria/ajef", "/masoneria/widows-sons"];
+
+// Redes activas (agrega Instagram / YouTube aquí cuando existan)
+const redes = [
+  { name: "Facebook", href: FB_URL, svg: <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /> },
+];
 
 export default function Footer() {
-  return (
-    <footer style={{ backgroundColor: C.navyDark }}>
-      {/* Main */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
+  const t = useT();
+  const anio = new Date().getFullYear();
+  const cols = [
+    { titulo: t.footer.colGranLogia, links: hrefsGranLogia.map((href, i) => ({ href, label: t.footer.linksGranLogia[i] })) },
+    { titulo: t.footer.colMasoneria, links: hrefsMasoneria.map((href, i) => ({ href, label: t.footer.linksMasoneria[i] })) },
+  ];
 
-          {/* Brand — 2 cols */}
-          <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-3 mb-6">
-              <img src="/logo.png" alt="Gran Logia BC" width={52} height={52} style={{ mixBlendMode: "screen" }} />
+  return (
+    <footer style={{ backgroundColor: navyDk }}>
+      <div className="wrap footer-main" style={{ paddingTop: "72px", paddingBottom: "56px" }}>
+        <div className="footer-grid">
+
+          {/* Marca + contacto */}
+          <div className="footer-brand">
+            <Link href="/" style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "28px", textDecoration: "none" }}>
+              <img src="/logo.png" alt="Gran Logia BC" width={58} height={58} />
               <div>
-                <div style={{ fontFamily: C.cinzel, color: "#fff", fontSize: "12px", fontWeight: 600, letterSpacing: "1px", lineHeight: 1.3 }}>
-                  Gran Logia de Estado
-                </div>
-                <div style={{ fontFamily: C.cinzel, color: C.gold, fontSize: "10px", letterSpacing: "2px" }}>
-                  &ldquo;BAJA CALIFORNIA&rdquo;
-                </div>
-                <div style={{ fontFamily: C.cinzel, color: "rgba(255,255,255,0.3)", fontSize: "9px", letterSpacing: "1.5px", marginTop: "2px" }}>
-                  DE ANTIGUOS LIBRES Y ACEPTADOS MASONES
-                </div>
+                <div style={{ fontFamily: Co, color: "#fff", fontSize: "1.45rem", fontWeight: 600, lineHeight: 1.1 }}>{t.nav.titleTop}</div>
+                <div style={{ fontFamily: R, color: gold, fontSize: "11px", fontWeight: 600, letterSpacing: "2.5px", textTransform: "uppercase", marginTop: "4px" }}>&ldquo;{t.nav.titleSub}&rdquo;</div>
+                <div style={{ fontFamily: R, color: "rgba(255,255,255,0.4)", fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase", marginTop: "3px" }}>{t.footer.org}</div>
               </div>
             </Link>
 
-            {/* Contacto */}
-            <div className="space-y-3 mb-8">
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "28px" }}>
               {[
-                { icon: "📍", text: "Calzada de los Presidentes No. 1250, Col. Los Pinos, Mexicali, B.C. C.P. 21110" },
-                { icon: "📞", text: "686 555 1234" },
-                { icon: "✉️", text: "info@glebc.mx" },
-              ].map((item) => (
-                <div key={item.icon} className="flex gap-3">
-                  <span style={{ fontSize: "13px", flexShrink: 0, marginTop: "2px" }}>{item.icon}</span>
-                  <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "13px", lineHeight: 1.5 }}>{item.text}</span>
-                </div>
+                { key: "dir",  text: DIRECCION, href: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Calle Francisco Goitia 9927-3A, Zona Río, Tijuana, Baja California, 22000"), icon: <><path d="M12 22s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z" /><circle cx="12" cy="10" r="2.5" /></> },
+                { key: "mail", text: CORREO,    href: `mailto:${CORREO}`, icon: <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M22 6l-10 7L2 6" /></> },
+              ].map(it => (
+                <a key={it.key} href={it.href} target={it.key === "dir" ? "_blank" : undefined} rel={it.key === "dir" ? "noopener noreferrer" : undefined}
+                  className="footer-link" style={{ display: "flex", gap: "12px", textDecoration: "none" }}>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={gold} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "3px" }}>{it.icon}</svg>
+                  <span style={{ fontFamily: D, fontSize: "15px", lineHeight: 1.5, wordBreak: "break-word" }}>{it.text}</span>
+                </a>
               ))}
             </div>
 
-            {/* Redes sociales */}
-            <div className="flex gap-3">
-              {["Facebook", "Instagram", "YouTube"].map((red) => (
-                <a key={red} href="#"
-                  className="px-3 py-1.5 transition-all duration-200"
-                  style={{ border: "1px solid rgba(201,169,110,0.3)", color: "rgba(255,255,255,0.5)", fontSize: "10px", fontFamily: C.cinzel, letterSpacing: "1px" }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = C.gold; e.currentTarget.style.color = C.gold; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(201,169,110,0.3)"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; }}>
-                  {red.toUpperCase()}
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              {redes.map(r => (
+                <a key={r.name} href={r.href} target="_blank" rel="noopener noreferrer" aria-label={r.name} className="footer-social"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "11px 18px", borderRadius: "12px", border: "1px solid rgba(198,161,91,0.35)", backgroundColor: "rgba(198,161,91,0.08)", color: "#fff", fontFamily: R, fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={gold} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{r.svg}</svg>
+                  {t.footer.follow} {r.name}
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Link columns */}
-          {Object.entries(cols).map(([cat, links]) => (
-            <div key={cat}>
-              <h4 style={{ fontFamily: C.cinzel, color: C.gold, fontSize: "10px", letterSpacing: "2.5px", fontWeight: 600, marginBottom: "20px" }}>
-                {cat.toUpperCase()}
+          {/* Columnas de enlaces */}
+          {cols.map(c => (
+            <nav key={c.titulo} aria-label={c.titulo}>
+              <h4 style={{ fontFamily: R, color: gold, fontSize: "12px", fontWeight: 700, letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "18px" }}>
+                {c.titulo}
               </h4>
-              <ul className="space-y-3">
-                {links.map((l) => (
-                  <li key={l}>
-                    <Link href="#"
-                      className="transition-colors duration-200"
-                      style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}
-                      onMouseEnter={e => (e.currentTarget.style.color = C.gold)}
-                      onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}>
-                      {l}
-                    </Link>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
+                {c.links.map(l => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="footer-link" style={{ fontFamily: D, fontSize: "15px", textDecoration: "none" }}>{l.label}</Link>
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
           ))}
+
+          {/* Portal de miembros */}
+          <div className="footer-portal">
+            <h4 style={{ fontFamily: R, color: gold, fontSize: "12px", fontWeight: 700, letterSpacing: "2.5px", textTransform: "uppercase", marginBottom: "18px" }}>
+              {t.footer.members}
+            </h4>
+            <p style={{ fontFamily: D, color: "rgba(255,255,255,0.55)", fontSize: "15px", lineHeight: 1.6, marginBottom: "18px" }}>
+              {t.footer.membersText}
+            </p>
+            <Link href="/miembros" className="nav-cta"
+              style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "12px 18px", borderRadius: "12px", backgroundColor: "#B08D57", color: navyDk, fontFamily: R, fontSize: "12px", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", textDecoration: "none" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+              {t.nav.portal}
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* Ornament */}
-      <div className="text-center py-4" style={{ borderTop: "1px solid rgba(201,169,110,0.1)" }}>
-        <span style={{ color: "rgba(201,169,110,0.3)", letterSpacing: "10px", fontSize: "14px" }}>✦ ✦ ✦</span>
-      </div>
-
-      {/* Bottom bar */}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "11px", fontFamily: C.cinzel, letterSpacing: "0.5px" }}>
-            © 2025 GRAN LOGIA DE ESTADO &ldquo;BAJA CALIFORNIA&rdquo;
+      {/* Barra inferior */}
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+        <div className="wrap" style={{ paddingTop: "20px", paddingBottom: "24px" }}>
+          <p style={{ fontFamily: D, color: "rgba(255,255,255,0.4)", fontSize: "13px", textAlign: "center" }}>
+            © {anio} {t.footer.fullName}. {t.footer.rights}
           </p>
-          <div className="flex gap-6">
-            {["Aviso de Privacidad", "Términos y Condiciones"].map((t) => (
-              <Link key={t} href="#"
-                style={{ color: "rgba(255,255,255,0.2)", fontSize: "11px", fontFamily: C.cinzel }}
-                onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.2)")}>
-                {t}
-              </Link>
-            ))}
-          </div>
         </div>
       </div>
     </footer>

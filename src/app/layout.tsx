@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Raleway, DM_Sans, Cormorant } from "next/font/google";
 import "./globals.css";
+import { LocaleProvider } from "@/i18n/LocaleProvider";
+import { getLocale } from "@/i18n/server";
+import { dictionaries } from "@/i18n/dictionaries";
+import { htmlLang } from "@/i18n/config";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -22,18 +26,23 @@ const cormorant = Cormorant({
   style: ["normal", "italic"],
 });
 
-export const metadata: Metadata = {
-  title: 'Gran Logia de Estado "Baja California" | Masonería Regular',
-  description:
-    'Muy Respetable Gran Logia de Estado "Baja California". Portal oficial de la Masonería Regular en Baja California, México. Fundada en 1925.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = dictionaries[await getLocale()];
+  return {
+    title: t.meta.siteTitle,
+    description: t.meta.siteDesc,
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
   return (
-    <html lang="es" className={`${raleway.variable} ${dmSans.variable} ${cormorant.variable}`}>
-      <body>{children}</body>
+    <html lang={htmlLang[locale]} className={`${raleway.variable} ${dmSans.variable} ${cormorant.variable}`}>
+      <body>
+        <LocaleProvider locale={locale}>{children}</LocaleProvider>
+      </body>
     </html>
   );
 }

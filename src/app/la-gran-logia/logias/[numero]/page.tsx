@@ -1,121 +1,156 @@
 "use client";
 
-import Link from "next/link";
+import type { ReactNode } from "react";
+import Link from "@/i18n/Link";
+import { useT } from "@/i18n/LocaleProvider";
 import { useParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { getLogiaByNumero } from "@/data/logias";
+import { logias, getLogiaByNumero } from "@/data/logias";
 
-const R = "var(--font-raleway), sans-serif";
-const D = "var(--font-dm-sans), system-ui, sans-serif";
-const Co = "var(--font-cormorant), Georgia, serif";
-const navy = "#0B2447";
-const navyDark = "#060F1E";
-const gold = "#B08D57";
-const ivory = "#F5F1EA";
-const border = "#E2DDD4";
-const textLight = "#6A6A6A";
+const R  = "var(--font-raleway), sans-serif";
+const D  = "var(--font-dm-sans), system-ui, sans-serif";
+const Co = "var(--font-cormorant), Georgia, 'Times New Roman', serif";
 
-// Cuadro de oficiales de relleno (estructura estándar de logia simbólica)
+const deep    = "#061426";
+const navyDk  = "#060F1E";
+const gold    = "#C6A15B";
+const goldDk  = "#8a6d3b";
+const cream   = "#F5F1E9";
+const canvas  = "#f4f4f5";
+const textPri = "#09090b";
+const textSec = "#3f3f46";
+const textMut = "#71717a";
+const line    = "#e4e4e7";
+
+
+// Estructura estándar de oficiales de una logia simbólica (en español, como en los datos)
 const cargosEstandar = [
-  "Venerable Maestro",
-  "Primer Vigilante",
-  "Segundo Vigilante",
-  "Orador",
-  "Secretario",
-  "Tesorero",
-  "Maestro de Ceremonias",
-  "Hospitalario",
-  "Primer Diácono",
-  "Segundo Diácono",
-  "Porta Estandarte",
-  "Guarda Templo",
+  "Venerable Maestro", "Primer Vigilante", "Segundo Vigilante", "Orador",
+  "Secretario", "Tesorero", "Maestro de Ceremonias", "Hospitalario",
+  "Primer Diácono", "Segundo Diácono", "Porta Estandarte", "Guarda Templo",
 ];
 
+const Label = ({ children }: { children: ReactNode }) => (
+  <span style={{ display: "block", fontFamily: R, color: gold, fontSize: "12px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase", marginBottom: "14px" }}>
+    {children}
+  </span>
+);
+
+const Icon = ({ d }: { d: ReactNode }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={goldDk} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
+);
+
 export default function LogiaPage() {
+  const t = useT();
+  const T = t.logia;
+  const PENDIENTE = t.common.pending;
+  // Traduce un cargo estándar al idioma actual (si no es estándar, se deja igual)
+  const cargoLocal = (c: string) => { const i = cargosEstandar.indexOf(c); return i >= 0 ? T.cargos[i] : c; };
   const params = useParams();
   const logia = getLogiaByNumero(Number(params.numero));
-  if (!logia) return null;
+
+  if (!logia) {
+    return (
+      <>
+        <Navbar />
+        <main style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "120px 20px", backgroundColor: canvas, textAlign: "center" }}>
+          <div>
+            <h1 style={{ fontFamily: Co, color: textPri, fontSize: "2.6rem", marginBottom: "12px" }}>{T.notFound}</h1>
+            <Link href="/la-gran-logia/logias" style={{ fontFamily: R, color: goldDk, fontWeight: 700 }}>{T.viewAll}</Link>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  const ordenadas = [...logias].sort((a, b) => a.numero - b.numero);
+  const idx = ordenadas.findIndex(l => l.numero === logia.numero);
+  const anterior  = idx > 0 ? ordenadas[idx - 1] : null;
+  const siguiente = idx < ordenadas.length - 1 ? ordenadas[idx + 1] : null;
 
   const cuadro = logia.cuadro && logia.cuadro.length > 0
     ? logia.cuadro
-    : cargosEstandar.map(cargo => ({ cargo, nombre: "Por confirmar" }));
+    : cargosEstandar.map(cargo => ({ cargo, nombre: PENDIENTE }));
+  const cuadroPendiente = cuadro.every(o => o.nombre === PENDIENTE);
+
+  const mensaje = logia.mensaje || T.defaultMessage;
+  const mapsUrl = logia.direccion
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${logia.direccion}, ${logia.ciudad}, Baja California`)}`
+    : null;
+
+  const info = [
+    { label: T.info.ciudad,   valor: logia.ciudad,                 icon: <><path d="M12 22s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z" /><circle cx="12" cy="10" r="2.5" /></> },
+    { label: T.info.fundada,  valor: `${logia.anio}`,              icon: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></> },
+    { label: T.info.sesiones, valor: logia.sesiones || PENDIENTE,  icon: <><circle cx="12" cy="12" r="9" /><path d="M8 12h8" /></> },
+    { label: T.info.horario,  valor: logia.horarios || PENDIENTE,  icon: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></> },
+  ];
 
   return (
     <>
       <Navbar />
-      <main>
+      <main style={{ backgroundColor: canvas }}>
 
-        {/* ── HERO ── */}
-        <section style={{ paddingTop: "76px", position: "relative", overflow: "hidden" }}>
-          {/* Imagen rectangular */}
-          <div style={{ position: "relative", height: "420px", backgroundColor: navyDark, overflow: "hidden" }}>
-            {logia.foto ? (
-              <img src={logia.foto} alt={`R∴ L∴ S∴ "${logia.nombre}"`}
-                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
-            ) : (
-              <div style={{
-                width: "100%", height: "100%",
-                background: `linear-gradient(135deg, #0B2447 0%, #060F1E 60%, #1A3A6B 100%)`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <div style={{ textAlign: "center" }}>
-                  <div style={{ fontFamily: R, color: `${gold}20`, fontSize: "8rem", fontWeight: 200, lineHeight: 1 }}>
-                    {logia.numero}
-                  </div>
-                  <div style={{ fontFamily: R, color: `${gold}25`, fontSize: "9px", letterSpacing: "4px", textTransform: "uppercase", marginTop: "12px" }}>
-                    Fotografía pendiente
-                  </div>
-                </div>
-              </div>
-            )}
-            {/* Gradiente inferior */}
-            <div style={{
-              position: "absolute", bottom: 0, left: 0, right: 0, height: "60%",
-              background: "linear-gradient(to top, rgba(6,15,30,0.92) 0%, transparent 100%)",
-            }} />
-            {/* Texto sobre la imagen */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "40px 64px" }}>
-              {/* Breadcrumb */}
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
-                <Link href="/" style={{ fontFamily: R, color: "rgba(255,255,255,0.3)", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>Inicio</Link>
-                <span style={{ color: "rgba(255,255,255,0.15)" }}>›</span>
-                <Link href="/la-gran-logia/gran-cuadro" style={{ fontFamily: R, color: "rgba(255,255,255,0.3)", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>La Gran Logia</Link>
-                <span style={{ color: "rgba(255,255,255,0.15)" }}>›</span>
-                <Link href="/la-gran-logia/logias" style={{ fontFamily: R, color: "rgba(255,255,255,0.3)", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>Logias</Link>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-                <div style={{ width: "24px", height: "1px", backgroundColor: gold }} />
-                <span style={{ fontFamily: R, color: gold, fontSize: "9px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase" }}>
-                  {logia.prefijo} · No. {logia.numero} · Fundada en {logia.anio}
+        {/* ── ENCABEZADO ── */}
+        <section style={{ position: "relative", overflow: "hidden", backgroundColor: navyDk }}>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 90% at 15% 50%, rgba(26,58,107,0.55) 0%, transparent 70%)" }} />
+          <div style={{ position: "absolute", right: "-4%", top: "50%", transform: "translateY(-50%)", fontFamily: Co, fontSize: "clamp(14rem, 30vw, 26rem)", fontWeight: 500, lineHeight: 1, color: "rgba(198,161,91,0.06)", pointerEvents: "none", userSelect: "none" }} aria-hidden="true">
+            {logia.numero}
+          </div>
+
+          <div className="wrap logia-hero-wrap" style={{ position: "relative", paddingTop: "128px", paddingBottom: "72px" }}>
+            {/* Ruta — escritorio: barra discreta arriba; móvil: solo "volver" */}
+            <nav aria-label="Ruta" className="d-only" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", marginBottom: "48px" }}>
+              {[{ l: t.common.home, h: "/" }, { l: t.common.granLogia, h: "/la-gran-logia" }, { l: t.logias.crumb, h: "/la-gran-logia/logias" }].map(c => (
+                <span key={c.h} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Link href={c.h} style={{ fontFamily: R, color: "rgba(255,255,255,0.5)", fontSize: "12px", letterSpacing: "1.5px", textTransform: "uppercase" }}>{c.l}</Link>
+                  <span style={{ color: "rgba(255,255,255,0.3)" }}>›</span>
                 </span>
+              ))}
+              <span style={{ fontFamily: R, color: gold, fontSize: "12px", letterSpacing: "1.5px", textTransform: "uppercase" }}>No. {logia.numero}</span>
+            </nav>
+            <Link href="/la-gran-logia/logias" className="m-only" style={{ fontFamily: R, color: "rgba(255,255,255,0.6)", fontSize: "13px", fontWeight: 600, letterSpacing: "1px", marginBottom: "28px", textDecoration: "none" }}>
+              {T.backAll}
+            </Link>
+
+            <div className="logia-hero">
+              {/* Emblema */}
+              <div className="logia-logo" style={{ width: "240px", height: "240px", borderRadius: "28px", backgroundColor: cream, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 24px 60px rgba(0,0,0,0.35)", overflow: "hidden" }}>
+                {logia.foto
+                  ? <img src={logia.foto} alt={`${t.logias.emblem} ${logia.nombre}`} style={{ width: "100%", height: "100%", objectFit: "contain", padding: "14px" }} />
+                  : <span style={{ fontFamily: Co, color: goldDk, fontSize: "6rem", fontWeight: 600, lineHeight: 1 }}>{logia.numero}</span>}
               </div>
-              <h1 style={{ fontFamily: R, color: "#fff", fontSize: "clamp(1.6rem, 3vw, 2.6rem)", fontWeight: 700, letterSpacing: "-0.5px" }}>
-                "{logia.nombre}"
-              </h1>
+
+              {/* Texto */}
+              <div>
+                <span style={{ display: "block", fontFamily: R, color: gold, fontSize: "13px", fontWeight: 600, letterSpacing: "2px", marginBottom: "14px" }}>
+                  {logia.prefijo}
+                </span>
+                <h1 style={{ fontFamily: Co, color: "#fff", fontSize: "clamp(2.8rem, 5.5vw, 4.8rem)", fontWeight: 500, lineHeight: 1, letterSpacing: "-0.5px", marginBottom: "24px" }}>
+                  &ldquo;{logia.nombre}&rdquo; <span style={{ color: gold, whiteSpace: "nowrap" }}>No. {logia.numero}</span>
+                </h1>
+
+                <p className="hero-msg" style={{ fontFamily: Co, color: "rgba(255,255,255,0.78)", fontSize: "clamp(1.25rem, 1.8vw, 1.55rem)", fontStyle: "italic", fontWeight: 500, lineHeight: 1.45, maxWidth: "620px" }}>
+                  &ldquo;{mensaje}&rdquo;
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* ── INFO RÁPIDA ── */}
-        <section style={{ backgroundColor: "#fff", borderBottom: `1px solid ${border}` }}>
-          <div className="max-w-7xl mx-auto px-8">
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
-              {[
-                { label: "Ciudad", valor: `${logia.ciudad}, B.C.` },
-                { label: "Fundada", valor: logia.anio.toString() },
-                { label: "Sesiones", valor: logia.sesiones || "Por confirmar" },
-                { label: "Horario", valor: logia.horarios || "Por confirmar" },
-              ].map((item, i) => (
-                <div key={item.label} style={{
-                  padding: "28px 32px",
-                  borderRight: i < 3 ? `1px solid ${border}` : "none",
-                }}>
-                  <div style={{ fontFamily: R, color: gold, fontSize: "9px", fontWeight: 600, letterSpacing: "2px", textTransform: "uppercase", marginBottom: "6px" }}>
-                    {item.label}
+        {/* ── DATOS RÁPIDOS ── */}
+        <section style={{ padding: "40px 0 0" }}>
+          <div className="wrap">
+            <div className="info-grid">
+              {info.map(i => (
+                <div key={i.label} style={{ backgroundColor: "#fff", border: `1px solid ${line}`, borderRadius: "16px", padding: "20px 22px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+                    <Icon d={i.icon} />
+                    <span style={{ fontFamily: R, color: textMut, fontSize: "12px", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase" }}>{i.label}</span>
                   </div>
-                  <div style={{ fontFamily: R, color: navy, fontSize: "14px", fontWeight: 700 }}>
-                    {item.valor}
+                  <div style={{ fontFamily: R, color: i.valor === PENDIENTE ? textMut : textPri, fontStyle: i.valor === PENDIENTE ? "italic" : "normal", fontSize: "17px", fontWeight: 700, lineHeight: 1.3 }}>
+                    {i.valor}
                   </div>
                 </div>
               ))}
@@ -123,185 +158,158 @@ export default function LogiaPage() {
           </div>
         </section>
 
-        {/* ── HISTORIA Y MENSAJE ── */}
-        <section style={{ backgroundColor: ivory, padding: "80px 0", borderBottom: `1px solid ${border}` }}>
-          <div className="max-w-7xl mx-auto px-8">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "start" }}>
-
-              {/* Historia */}
+        {/* ── HISTORIA + MENSAJE ── */}
+        <section className="sec" style={{ paddingTop: "72px" }}>
+          <div className="wrap">
+            <div style={{ maxWidth: "860px" }}>
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
-                  <div style={{ width: "24px", height: "2px", backgroundColor: gold }} />
-                  <h2 style={{ fontFamily: R, color: gold, fontSize: "10px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase" }}>
-                    Historia
-                  </h2>
-                </div>
-                <h3 style={{ fontFamily: R, color: navy, fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.3px", marginBottom: "20px" }}>
-                  Nuestra trayectoria
-                </h3>
-                <div style={{ width: "32px", height: "2px", backgroundColor: gold, marginBottom: "24px" }} />
-                <p style={{ fontFamily: D, color: textLight, fontSize: "15px", lineHeight: 1.85, marginBottom: "16px" }}>
-                  La Respetable Logia Simbólica "{logia.nombre}" No. {logia.numero} fue fundada en {logia.anio} en la ciudad de {logia.ciudad}, Baja California, bajo los auspicios de la Gran Logia de Estado.
+                <Label>{T.historia.label}</Label>
+                <h2 style={{ fontFamily: Co, color: textPri, fontSize: "clamp(2.2rem, 3.4vw, 3rem)", fontWeight: 500, lineHeight: 1.05, marginBottom: "20px" }}>
+                  {T.historia.title}
+                </h2>
+                <p style={{ fontFamily: D, color: textSec, fontSize: "17px", lineHeight: 1.85, textAlign: "justify", marginBottom: "16px" }}>
+                  {T.historia.p1(logia.nombre, logia.numero, logia.anio, logia.ciudad)}
                 </p>
-                <p style={{ fontFamily: D, color: textLight, fontSize: "15px", lineHeight: 1.85 }}>
-                  A lo largo de su historia, ha sido un faro de luz y fraternidad para sus hermanos y un ejemplo de servicio para la comunidad bajacaliforniana, contribuyendo al desarrollo moral e intelectual de sus miembros.
+                <p style={{ fontFamily: D, color: textSec, fontSize: "17px", lineHeight: 1.85, textAlign: "justify" }}>
+                  {T.historia.p2}
                 </p>
               </div>
-
-              {/* Mensaje */}
-              <div style={{
-                backgroundColor: navyDark,
-                padding: "48px",
-                position: "relative",
-                overflow: "hidden",
-              }}>
-                <div style={{
-                  position: "absolute", inset: 0,
-                  background: `radial-gradient(ellipse 80% 80% at 110% 110%, rgba(201,169,110,0.07) 0%, transparent 60%)`,
-                }} />
-                <div style={{ position: "relative", zIndex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
-                    <div style={{ width: "20px", height: "1px", backgroundColor: gold }} />
-                    <span style={{ fontFamily: R, color: gold, fontSize: "9px", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase" }}>
-                      Mensaje de la Logia
-                    </span>
-                  </div>
-                  <div style={{ fontFamily: R, color: `${gold}30`, fontSize: "5rem", lineHeight: 0.8, fontWeight: 200, marginBottom: "16px" }}>"</div>
-                  <p style={{ fontFamily: Co, color: "rgba(255,255,255,0.75)", fontSize: "1.2rem", fontStyle: "italic", lineHeight: 1.8 }}>
-                    {logia.mensaje || "Nuestro templo permanece abierto para todos los hombres de bien que buscan perfeccionarse a sí mismos y contribuir al bienestar de la humanidad."}
-                  </p>
-                </div>
-              </div>
-
             </div>
           </div>
         </section>
 
         {/* ── CUADRO DE OFICIALES ── */}
-        <section style={{ backgroundColor: "#fff", padding: "80px 0", borderBottom: `1px solid ${border}` }}>
-          <div className="max-w-7xl mx-auto px-8">
-            <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "48px" }}>
-              <div style={{ width: "24px", height: "2px", backgroundColor: gold }} />
-              <h2 style={{ fontFamily: R, color: navy, fontSize: "11px", fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase" }}>
-                Cuadro de Oficiales
+        <section className="sec" style={{ backgroundColor: "#fff", borderTop: `1px solid ${line}`, borderBottom: `1px solid ${line}` }}>
+          <div className="wrap">
+            <div style={{ marginBottom: "36px" }}>
+              <Label>{T.cuadro.label}</Label>
+              <h2 style={{ fontFamily: Co, color: textPri, fontSize: "clamp(2.2rem, 3.4vw, 3rem)", fontWeight: 500, lineHeight: 1.05 }}>
+                {T.cuadro.title}
               </h2>
-              <div style={{ flex: 1, height: "1px", backgroundColor: border }} />
+              {cuadroPendiente && (
+                <p style={{ fontFamily: D, color: textMut, fontSize: "15px", marginTop: "10px" }}>
+                  {T.cuadro.pending}
+                </p>
+              )}
             </div>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-              gap: "1px",
-              backgroundColor: border,
-              border: `1px solid ${border}`,
-            }}>
-              {cuadro.map((oficial) => (
-                <div key={oficial.cargo} style={{ backgroundColor: "#fff", padding: "22px 28px", transition: "background 0.2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = ivory)}
-                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#fff")}
-                >
-                  <div style={{ fontFamily: R, color: gold, fontSize: "9px", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "5px" }}>
-                    {oficial.cargo}
+
+            <div className="ofi-grid">
+              {cuadro.map((o, i) => {
+                const pend = o.nombre === PENDIENTE;
+                const vm = i === 0;
+                return (
+                  <div key={o.cargo} style={{
+                    borderRadius: "14px", padding: "18px 20px",
+                    backgroundColor: vm ? deep : canvas,
+                    border: `1px solid ${vm ? deep : line}`,
+                    display: "flex", alignItems: "center", gap: "14px",
+                  }}>
+                    <span style={{ width: "40px", height: "40px", flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: Co, fontSize: "1.1rem", fontWeight: 600, color: vm ? deep : goldDk, backgroundColor: vm ? gold : cream }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontFamily: R, color: vm ? gold : goldDk, fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "3px" }}>
+                        {cargoLocal(o.cargo)}
+                      </div>
+                      <div style={{ fontFamily: R, fontSize: "16px", fontWeight: 600, fontStyle: pend ? "italic" : "normal", color: vm ? (pend ? "rgba(255,255,255,0.5)" : "#fff") : (pend ? textMut : textPri) }}>
+                        {o.nombre}
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ fontFamily: R, color: oficial.nombre === "Por confirmar" ? "rgba(11,36,71,0.3)" : navy, fontSize: "14px", fontWeight: 700, fontStyle: oficial.nombre === "Por confirmar" ? "italic" : "normal" }}>
-                    {oficial.nombre}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
 
-        {/* ── CONTACTO Y REDES ── */}
-        <section style={{ backgroundColor: ivory, padding: "72px 0" }}>
-          <div className="max-w-7xl mx-auto px-8">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "start" }}>
-
-              {/* Contacto */}
+        {/* ── VISÍTANOS ── */}
+        <section className="sec">
+          <div className="wrap">
+            <div className="duo" style={{ alignItems: "start" }}>
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "32px" }}>
-                  <div style={{ width: "24px", height: "2px", backgroundColor: gold }} />
-                  <h2 style={{ fontFamily: R, color: navy, fontSize: "11px", fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase" }}>
-                    Contacto
-                  </h2>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <Label>{T.visit.label}</Label>
+                <h2 style={{ fontFamily: Co, color: textPri, fontSize: "clamp(2.2rem, 3.4vw, 3rem)", fontWeight: 500, lineHeight: 1.05, marginBottom: "24px" }}>
+                  {T.visit.title}
+                </h2>
+                <div style={{ backgroundColor: "#fff", border: `1px solid ${line}`, borderRadius: "16px", overflow: "hidden" }}>
                   {[
-                    { label: "Ciudad", valor: `${logia.ciudad}, Baja California` },
-                    { label: "Dirección", valor: logia.direccion || "Por confirmar" },
-                    { label: "Sesiones", valor: logia.sesiones || "Por confirmar" },
-                    { label: "Horario", valor: logia.horarios || "Por confirmar" },
-                  ].map(item => (
-                    <div key={item.label} style={{ display: "flex", gap: "16px", paddingBottom: "20px", borderBottom: `1px solid ${border}` }}>
-                      <div style={{ fontFamily: R, color: gold, fontSize: "9px", fontWeight: 600, letterSpacing: "2px", textTransform: "uppercase", minWidth: "80px", paddingTop: "2px" }}>
-                        {item.label}
-                      </div>
-                      <div style={{ fontFamily: D, color: item.valor === "Por confirmar" ? "rgba(11,36,71,0.3)" : navy, fontSize: "14px", fontStyle: item.valor === "Por confirmar" ? "italic" : "normal" }}>
-                        {item.valor}
-                      </div>
+                    { label: T.info.direccion, valor: logia.direccion || PENDIENTE },
+                    { label: T.info.ciudad,    valor: `${logia.ciudad}, ${T.state}` },
+                    { label: T.info.sesiones,  valor: logia.sesiones || PENDIENTE },
+                    { label: T.info.horario,   valor: logia.horarios || PENDIENTE },
+                  ].map((r, i, arr) => (
+                    <div key={r.label} style={{ display: "flex", gap: "16px", padding: "16px 20px", borderBottom: i < arr.length - 1 ? `1px solid ${line}` : "none" }}>
+                      <span style={{ fontFamily: R, color: goldDk, fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", minWidth: "92px", paddingTop: "3px" }}>{r.label}</span>
+                      <span style={{ fontFamily: D, fontSize: "16px", color: r.valor === PENDIENTE ? textMut : textPri, fontStyle: r.valor === PENDIENTE ? "italic" : "normal" }}>{r.valor}</span>
                     </div>
                   ))}
                 </div>
+                {mapsUrl && (
+                  <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: "10px", marginTop: "16px", padding: "14px 22px", borderRadius: "14px", backgroundColor: deep, color: "#fff", fontFamily: R, fontSize: "14px", fontWeight: 700, textDecoration: "none" }}>
+                    {T.visit.howTo} <span style={{ color: gold }}>→</span>
+                  </a>
+                )}
               </div>
 
-              {/* Redes sociales */}
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "32px" }}>
-                  <div style={{ width: "24px", height: "2px", backgroundColor: gold }} />
-                  <h2 style={{ fontFamily: R, color: navy, fontSize: "11px", fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase" }}>
-                    Redes Sociales
-                  </h2>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {logia.facebook ? (
-                    <a href={logia.facebook} target="_blank" rel="noopener noreferrer" style={{
-                      display: "flex", alignItems: "center", gap: "14px",
-                      padding: "16px 20px", backgroundColor: "#fff", border: `1px solid ${border}`,
-                      transition: "border-color 0.2s", textDecoration: "none",
-                    }}
-                      onMouseEnter={e => (e.currentTarget.style.borderColor = gold)}
-                      onMouseLeave={e => (e.currentTarget.style.borderColor = border)}
-                    >
-                      <span style={{ fontFamily: R, color: navy, fontSize: "12px", fontWeight: 700, letterSpacing: "0.5px" }}>Facebook</span>
-                    </a>
-                  ) : (
-                    <div style={{ padding: "16px 20px", backgroundColor: "#fff", border: `1px solid ${border}` }}>
-                      <span style={{ fontFamily: D, color: "rgba(11,36,71,0.3)", fontSize: "13px", fontStyle: "italic" }}>Facebook — Por confirmar</span>
-                    </div>
-                  )}
-                  {logia.instagram ? (
-                    <a href={logia.instagram} target="_blank" rel="noopener noreferrer" style={{
-                      display: "flex", alignItems: "center", gap: "14px",
-                      padding: "16px 20px", backgroundColor: "#fff", border: `1px solid ${border}`,
-                      transition: "border-color 0.2s", textDecoration: "none",
-                    }}
-                      onMouseEnter={e => (e.currentTarget.style.borderColor = gold)}
-                      onMouseLeave={e => (e.currentTarget.style.borderColor = border)}
-                    >
-                      <span style={{ fontFamily: R, color: navy, fontSize: "12px", fontWeight: 700, letterSpacing: "0.5px" }}>Instagram</span>
-                    </a>
-                  ) : (
-                    <div style={{ padding: "16px 20px", backgroundColor: "#fff", border: `1px solid ${border}` }}>
-                      <span style={{ fontFamily: D, color: "rgba(11,36,71,0.3)", fontSize: "13px", fontStyle: "italic" }}>Instagram — Por confirmar</span>
-                    </div>
-                  )}
+                <Label>{T.social.label}</Label>
+                <h2 style={{ fontFamily: Co, color: textPri, fontSize: "clamp(2.2rem, 3.4vw, 3rem)", fontWeight: 500, lineHeight: 1.05, marginBottom: "24px" }}>
+                  {T.social.title}
+                </h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {[
+                    { name: "Facebook",  url: logia.facebook,  svg: <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /> },
+                    { name: "Instagram", url: logia.instagram, svg: <><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="0.5" /></> },
+                  ].map(s => {
+                    const content = (
+                      <>
+                        <span style={{ width: "44px", height: "44px", borderRadius: "12px", backgroundColor: cream, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <Icon d={s.svg} />
+                        </span>
+                        <span style={{ flex: 1 }}>
+                          <span style={{ display: "block", fontFamily: R, color: textPri, fontSize: "16px", fontWeight: 700 }}>{s.name}</span>
+                          <span style={{ display: "block", fontFamily: D, color: textMut, fontSize: "14px", fontStyle: s.url ? "normal" : "italic" }}>{s.url ? T.social.visit : PENDIENTE}</span>
+                        </span>
+                        {s.url && <span className="bento-arrow-icon" style={{ color: deep, fontSize: "17px" }}>→</span>}
+                      </>
+                    );
+                    const box = { display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", backgroundColor: "#fff", border: `1px solid ${line}`, borderRadius: "16px", textDecoration: "none" } as const;
+                    return s.url
+                      ? <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer" className="logia-card" style={box}>{content}</a>
+                      : <div key={s.name} style={{ ...box, opacity: 0.7 }}>{content}</div>;
+                  })}
                 </div>
               </div>
-
             </div>
           </div>
         </section>
 
-        {/* ── VOLVER ── */}
-        <div style={{ backgroundColor: "#fff", padding: "32px 0", borderTop: `1px solid ${border}` }}>
-          <div className="max-w-7xl mx-auto px-8">
-            <Link href="/la-gran-logia/logias" style={{
-              fontFamily: R, fontSize: "11px", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase",
-              color: navy, borderBottom: `2px solid ${gold}`, paddingBottom: "3px",
-            }}>
-              ← Todas las logias
-            </Link>
+        {/* ── NAVEGACIÓN ENTRE LOGIAS ── */}
+        <section style={{ padding: "0 0 88px" }}>
+          <div className="wrap">
+            <div className="pager">
+              {[{ l: anterior, dir: "prev" as const }, { l: siguiente, dir: "next" as const }].map(({ l, dir }) =>
+                l ? (
+                  <Link key={dir} href={`/la-gran-logia/logias/${l.numero}`} className="logia-card"
+                    style={{ display: "flex", flexDirection: "column", alignItems: dir === "prev" ? "flex-start" : "flex-end", textAlign: dir === "prev" ? "left" : "right", gap: "6px", padding: "20px 22px", backgroundColor: "#fff", border: `1px solid ${line}`, borderRadius: "16px", textDecoration: "none" }}>
+                    <span style={{ fontFamily: R, color: textMut, fontSize: "12px", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase" }}>
+                      {dir === "prev" ? T.prev : T.next}
+                    </span>
+                    <span style={{ fontFamily: Co, color: textPri, fontSize: "1.5rem", fontWeight: 600, lineHeight: 1.1 }}>
+                      No. {l.numero}<span className="pager-name"> · {l.nombre}</span>
+                    </span>
+                  </Link>
+                ) : <div key={dir} />
+              )}
+            </div>
+            <div style={{ textAlign: "center", marginTop: "28px" }}>
+              <Link href="/la-gran-logia/logias" style={{ fontFamily: R, fontSize: "14px", fontWeight: 700, color: deep, borderBottom: `2px solid ${gold}`, paddingBottom: "4px", textDecoration: "none" }}>
+                {T.viewAll}
+              </Link>
+            </div>
           </div>
-        </div>
+        </section>
 
       </main>
       <Footer />

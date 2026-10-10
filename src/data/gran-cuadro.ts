@@ -4,7 +4,10 @@ export interface Oficial {
   nombre: string;
   grupo: "Oficiales Principales" | "Oficiales Menores" | "Diputados de Distrito";
   logia?: string;
+  /** Puede tener varios párrafos separados por una línea en blanco (\n\n).
+   *  Una línea que empieza con "—" se muestra como autor de la cita. */
   mensaje?: string;
+  mensajeTitulo?: string;
   foto?: string;
 }
 
@@ -13,7 +16,7 @@ export const oficiales: Oficial[] = [
   { slug: "ernesto-girbau-jimenez", cargo: "Muy Respetable Gran Maestro", nombre: "Ernesto Girbau Jiménez", grupo: "Oficiales Principales", foto: "/gran-maestro.jpg", logia: "R∴L∴S∴ 'Fraternidad de Justicia Social' No.48", mensaje: "La Masonería se fortalece cuando trabajamos unidos, con fraternidad y con el compromiso de servir a nuestros hermanos pero sobre todo a nuestra sociedad." },
   { slug: "jonathan-abarca-guzman", cargo: "Diputado Gran Maestro", nombre: "Jonathan Alain Abarca Guzmán", grupo: "Oficiales Principales", foto: "/diputado-gran-maestro.jpg", logia: "D∴L∴y P∴R∴L∴S∴ 'Manuel P. Barbachano' No.18", mensaje: "" },
   { slug: "cristobal-ruiz-leon", cargo: "Primer Gran Vigilante", nombre: "Cristobal Ruiz León", grupo: "Oficiales Principales", foto: "/primer-gran-vigilante.jpg", logia: "R∴L∴S∴ 'Raúl Arturo Gómez Mariscal' No.55", mensaje: "" },
-  { slug: "alberto-zuniga-barragan", cargo: "Segundo Gran Vigilante", nombre: "Alberto Zúñiga Barragán", grupo: "Oficiales Principales", logia: "R∴L∴S∴ 'Pueblos Yumanos' No.72", mensaje: "Es obligación del hombre aprender para después enseñar, pues el conocimiento que no se comparte es conocimiento desperdiciado." },
+  { slug: "alberto-zuniga-barragan", cargo: "Segundo Gran Vigilante", nombre: "Alberto Zúñiga Barragán", grupo: "Oficiales Principales", foto: "/segundo-gran-vigilante.png", logia: "R∴L∴S∴ 'Pueblos Yumanos' No.72", mensaje: "Es obligación del hombre aprender para después enseñar, pues el conocimiento que no se comparte es conocimiento desperdiciado." },
   { slug: "cesar-santos-diaz", cargo: "Gran Orador", nombre: "César Romeo Santos Díaz", grupo: "Oficiales Principales", foto: "/gran-orador.jpg", logia: "R∴L∴S∴ 'Raúl Arturo Gómez Mariscal' No.55", mensaje: "" },
   { slug: "servando-alvarado-lopez", cargo: "Gran Tesorero", nombre: "Servando Alvarado López", grupo: "Oficiales Principales", foto: "/gran-tesorero.jpg", logia: "D∴L∴y B∴R∴L∴S∴ 'Chee Kung Tong' No.9", mensaje: "" },
   { slug: "ricardo-osorio-rueda", cargo: "Gran Secretario", nombre: "Ricardo Elías Osorio Rueda", grupo: "Oficiales Principales", foto: "/gran-secretario.jpg", logia: "R∴L∴S∴ 'Mensajeros de la Fraternidad' No.74", mensaje: "" },
@@ -30,7 +33,10 @@ export const oficiales: Oficial[] = [
   { slug: "riggel-dehesa-zazueta", cargo: "Gran Porta Estandarte", nombre: "Riggel Alioth Dehesa Zazueta", grupo: "Oficiales Menores", foto: "/gran-portaestandarte.jpg", logia: "R∴L∴S∴ 'Fernando Suárez Núñez' No.65", mensaje: "" },
   { slug: "edgar-reyes-galicia", cargo: "Gran Guarda Templo Interior", nombre: "Edgar Rogelio Reyes Galicia", grupo: "Oficiales Menores", foto: "/gran-guardatemplo-interior.jpg", logia: "R∴L∴S∴ 'Benito Juárez' No.46", mensaje: "" },
   { slug: "carlos-salmeron-canizalez", cargo: "Gran Guarda Templo Exterior", nombre: "Carlos Adrián Salmerón Canizalez", grupo: "Oficiales Menores", logia: "D∴L∴y P∴R∴L∴S∴ 'Manuel P. Barbachano' No.18", mensaje: "" },
-  { slug: "gran-comisionado-ajef", cargo: "Gran Comisionado ante la AJEF", nombre: "Roberto Leyva Jaramillo", grupo: "Oficiales Menores", foto: "/gran-comisionado-ajef.jpg", logia: "R∴L∴S∴ 'Fernando Suárez Núñez' No.65", mensaje: "El futuro de la masonería no dependerá de cuántas respuestas seamos capaces de preservar, sino de cuántos hombres seamos capaces de formar para continuar haciéndose preguntas mejor." },
+  { slug: "gran-comisionado-ajef", cargo: "Gran Comisionado AJEF", nombre: "Roberto Leyva Jaramillo", grupo: "Oficiales Menores", foto: "/gran-comisionado-ajef.jpg", logia: "R∴L∴S∴ 'Fernando Suárez Núñez' No.65", mensaje: "El futuro de la masonería no dependerá de cuántas respuestas seamos capaces de preservar, sino de cuántos hombres seamos capaces de formar para continuar haciéndose preguntas mejor." },
+  { slug: "josue-torres-lopez", cargo: "Gran Fiscal Especial Adscrito", nombre: "Mtro. Josué Torres López", grupo: "Oficiales Menores", foto: "/gran-fiscal-especial.png", logia: "R∴L∴S∴ 'Cuitláhuac' No.60",
+    mensajeTitulo: "Nuestra visión de justicia",
+    mensaje: "«Que todo el que se queje con justicia, tenga un tribunal que lo escuche, lo ampare y lo defienda contra el fuerte y el arbitrario».\n— José María Morelos y Pavón (Sentimientos de la Nación, 1813)\n\nAsumiendo este legado, nuestra Muy Respetable Gran Logia de Estado Baja California, a través de la oficina del Gran Fiscal, declara como principio rector en el cumplimiento de su obligación de impartir justicia masónica, que: «La ley es dura, pero es la ley; pues el poder ministerial no se ejerce para ser temido ni para acumular cargos, sino para amparar al débil, corregir fraternalmente al hermano infractor y, en última instancia, restaurar el orden donde fue destruido por el caos»." },
 
   // Diputados de Distrito
   { slug: "diputado-tijuana-rosarito", cargo: "Diputado de Distrito Tijuana – Rosarito", nombre: "Nombramiento pendiente", grupo: "Diputados de Distrito", logia: "", mensaje: "" },
