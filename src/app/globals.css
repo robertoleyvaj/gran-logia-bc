@@ -227,9 +227,15 @@ body {
     max-height: 900px;
     align-items: flex-end !important;
   }
-  .hero .hero-img { object-position: 68% 20% !important; }
+  /* La foto ocupa solo la parte de arriba para que la gente se vea sobre el texto */
+  .hero { background-color: #060F1E; }
+  .hero .hero-img {
+    inset: 0 0 auto 0 !important;
+    height: 58% !important;
+    object-position: 62% 30% !important;
+  }
   .hero-grad-x {
-    background: linear-gradient(to top, #060F1E 0%, rgba(6,15,30,0.88) 34%, rgba(6,15,30,0.25) 62%, rgba(6,15,30,0.45) 100%) !important;
+    background: linear-gradient(to top, #060F1E 0%, #060F1E 44%, rgba(6,15,30,0.55) 54%, rgba(6,15,30,0.05) 72%, rgba(6,15,30,0.35) 100%) !important;
   }
   .hero-grad-y { display: none; }
   .hero-content {
